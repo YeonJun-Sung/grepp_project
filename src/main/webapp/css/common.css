@@ -4,3 +4,106 @@ html {
 	width: 99.5%;
 	height: 95%;
 }
+
+.main_page_html {
+	width: inherit;
+	height: inherit;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+.main_table {
+	width: 1600px;
+	height: 800px;
+	margin: auto;
+}
+
+#todo_list_title {
+	height: 30px;
+	text-align: center;
+}
+
+.todo_list_table {
+	width: 800px;
+	height: 700px;
+	margin: auto;
+}
+
+.priority_up_bt, .priority_down_bt {
+	float: right;
+}
+
+.margin_top15 {
+	margin-top: 15px;
+}
+
+td, th {
+	border: 1px solid black;
+}
+
+.todo_detail_view, .todo_detail_edit, .todo_detail_add, .todo_detail_div {
+	display: none;
+}
+
+.todo_detail_table {
+	width: -webkit-fill-available;
+    width: 800px;
+    height: 700px;
+    text-align: center;
+	margin: auto;
+}
+
+.todo_button {
+	float: right;
+}
+
+#todo_detail_title {
+	width: -webkit-fill-available;
+	height: 100%;
+}
+
+#todo_detail_title_edit {
+	width: -webkit-fill-available;
+	height: 100%;
+	border: none;
+}
+
+#todo_detail_title_add {
+	width: -webkit-fill-available;
+	height: 100%;
+	border: none;
+}
+
+#todo_detail_contents {
+	width: -webkit-fill-available;
+	height: 100%;
+	text-align: initial;
+}
+
+#todo_detail_contents_edit {
+	width: -webkit-fill-available;
+	height: 650px;
+	padding: 0px;
+	border: none;
+}
+
+#todo_detail_contents_add {
+	width: -webkit-fill-available;
+	height: 650px;
+	padding: 0px;
+	border: none;
+}
+
+#todo_detail_deadline {
+	width: 200px;
+}
+
+#todo_detail_deadline_edit {
+	width: 200px;
+}
+
+#todo_detail_deadline_add {
+	width: 200px;
+}

@@ -18,8 +18,8 @@
 	</appender>
 
 	<!-- Application Loggers -->
-	<logger name="pubg" additivity="false">
-		<level value="debug" />
+	<logger name="xxung" additivity="false">
+		<level value="DEBUG" />
 		<appender-ref ref="console" />
 	</logger>
 

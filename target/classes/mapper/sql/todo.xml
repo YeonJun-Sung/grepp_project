@@ -2,4 +2,147 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
  
 <mapper namespace="todo">
+	<select id="getTodoList" parameterType="hashmap" resultType="hashmap">
+		SELECT *
+		FROM list_contents a
+			LEFT OUTER JOIN list_priority b
+			on a.list_key = b.list_key
+			LEFT OUTER JOIN list_status c
+			on a.list_key = c.list_key
+		ORDER BY list_pri is null ASC, list_pri ASC, list_stat ASC, list_date ASC 
+		limit 10
+		offset ${offset};
+	</select>
+	
+	<select id="getPaging" resultType="Integer">
+		SELECT Ceil(count(*) / 10)
+		FROM list_contents a
+	</select>
+	
+	<insert id="saveTodoListContents" parameterType="hashMap">
+		INSERT INTO list_contents	(list_key, list_title, list_content)
+		VALUES (uuid(), #{title}, #{contents})
+		<selectKey keyProperty="list_key" resultType="String" order="AFTER">
+		SELECT list_key
+		FROM list_contents
+		ORDER BY seq DESC
+		limit 1;
+		</selectKey>
+    </insert>
+	
+	<insert id="saveTodoListPriority" parameterType="hashMap">
+		INSERT INTO list_priority	(list_key
+		<if test='priority != null and !priority.equals("")'>, list_pri</if>)
+		VALUES (#{list_key}
+		<if test='priority != null and !priority.equals("")'>, ${priority}</if>)
+    </insert>
+	
+	<insert id="saveTodoListStatus" parameterType="hashMap">
+		INSERT INTO list_status	(list_key
+		<if test='deadline != null and !deadline.equals("")'>, list_date, list_stat)</if>
+		<if test='deadline == null or deadline.equals("")'>, list_stat)</if>
+		VALUES (#{list_key}
+		<if test='deadline != null and !deadline.equals("")'>, #{deadline}, '1')</if>
+		<if test='deadline == null or deadline.equals("")'>, '2')</if>
+    </insert>
+	
+	<select id="getTodoDetail" parameterType="String" resultType="hashmap">
+		SELECT *
+		FROM list_contents a
+			LEFT OUTER JOIN list_priority b
+			on a.list_key = b.list_key
+			LEFT OUTER JOIN list_status c
+			on a.list_key = c.list_key
+		WHERE
+			a.list_key = #{list_key}
+	</select>
+
+	<update id="completeTodo" parameterType="String">
+		UPDATE list_status
+		SET
+			list_stat = '3'
+		WHERE 
+			list_key = #{list_key}
+	</update>
+
+	<update id="removePriority" parameterType="String">
+		UPDATE list_priority
+		SET
+			list_pri = null
+		WHERE 
+			list_key = #{list_key}
+	</update>
+
+	<delete id="deleteTodoPriority" parameterType="String">
+		DELETE FROM list_priority
+		WHERE list_key = #{list_key}
+	</delete>
+
+	<delete id="deleteTodoStatus" parameterType="String">
+		DELETE FROM list_status
+		WHERE list_key = #{list_key}
+	</delete>
+
+	<delete id="deleteTodoContents" parameterType="String">
+		DELETE FROM list_contents
+		WHERE list_key = #{list_key}
+	</delete>
+
+	<update id="editTodoListContents" parameterType="hashmap">
+		UPDATE list_contents
+		SET
+			list_title = #{title}
+			, list_content = #{contents}
+		WHERE list_key = #{list_key}
+	</update>
+	
+	<update id="editTodoListPriority" parameterType="hashmap">
+		UPDATE list_priority
+		SET
+			list_pri = ${priority}
+		WHERE list_key = #{list_key}
+	</update>
+	
+	<update id="editTodoListStatus" parameterType="hashmap">
+		UPDATE list_status
+		SET
+			<if test='deadline != null and !deadline.equals("")'>
+			list_date = #{deadline}
+			, list_stat = '1'
+			</if>
+			<if test='deadline == null or deadline.equals("")'>
+			list_stat = '2'
+			</if>
+		WHERE 
+			list_key = #{list_key}
+	</update>
+	
+	<update id="addPriority" parameterType="hashmap">
+		UPDATE list_priority
+		SET
+			list_pri = ${priority}
+		WHERE list_key = #{list_key}
+	</update>
+	
+	<select id="getPriorityList" parameterType="Integer" resultType="hashmap">
+		SELECT list_key, list_pri
+		FROM list_priority
+		WHERE 
+			list_pri is not null
+		ORDER BY list_pri ASC;
+	</select>
+
+	<update id="updatePriority" parameterType="java.util.List">
+		<foreach collection="list" item="up" separator=";">
+			UPDATE list_priority
+			SET
+				list_pri = ${up.list_pri}
+			WHERE list_key = #{up.list_key}
+		</foreach>
+	</update>
+	
+	<select id="getMaxPriority" resultType="Integer">
+		SELECT max(list_pri)
+		FROM list_priority
+	</select>
 </mapper>
