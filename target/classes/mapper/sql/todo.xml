@@ -124,7 +124,7 @@
 		WHERE list_key = #{list_key}
 	</update>
 	
-	<select id="getPriorityList" parameterType="Integer" resultType="hashmap">
+	<select id="getPriorityList" resultType="hashmap">
 		SELECT list_key, list_pri
 		FROM list_priority
 		WHERE 
@@ -142,7 +142,34 @@
 	</update>
 	
 	<select id="getMaxPriority" resultType="Integer">
-		SELECT max(list_pri)
+		SELECT IF(max(list_pri) is null, 0, max(list_pri))
 		FROM list_priority
 	</select>
+	
+	<update id="moveExprationTodo">
+		UPDATE list_status
+		SET
+			list_stat = '0'
+		WHERE
+			DATEDIFF(list_date, now()) <![CDATA[<=]]> 0
+			and list_date is not null
+			and list_stat != '-1'
+	</update>
+	
+	<select id="getExprationTodo" resultType="hashmap">
+		SELECT *
+		FROM list_contents a
+			LEFT OUTER JOIN list_status b
+			on a.list_key = b.list_key
+		WHERE
+			b.list_stat = '0'
+	</select>
+	
+	<update id="moveAlarm">
+		UPDATE list_status
+		SET
+			list_stat = '-1'
+		WHERE
+			list_key = #{list_key}
+	</update>
 </mapper>

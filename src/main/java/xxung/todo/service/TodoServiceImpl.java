@@ -80,15 +80,17 @@ public class TodoServiceImpl implements TodoService {
 	@Override
 	public void orderPriority(int num) throws Exception {
 		// TODO Auto-generated method stub
-		List<Map<String, Object>> list = todoDAO.getPriorityList(num);
-		
-		for(int i = 0;i < list.size();i++) {
-			if(i + 1 >= num)
-				list.get(i).put("list_pri", i + 2);
-			else
-				list.get(i).put("list_pri", i + 1);
+		List<Map<String, Object>> list = todoDAO.getPriorityList();
+
+		if(list.size() != 0) {
+			for(int i = 0;i < list.size();i++) {
+				if(i + 1 >= num)
+					list.get(i).put("list_pri", i + 2);
+				else
+					list.get(i).put("list_pri", i + 1);
+			}
+			todoDAO.updatePriority(list);	
 		}
-		todoDAO.updatePriority(list);
 	}
 
 	@Override
@@ -101,6 +103,24 @@ public class TodoServiceImpl implements TodoService {
 	public void removePriority(String list_key) throws Exception {
 		// TODO Auto-generated method stub
 		todoDAO.removePriority(list_key);
+	}
+
+	@Override
+	public void moveExprationTodo() throws Exception {
+		// TODO Auto-generated method stub
+		todoDAO.moveExprationTodo();
+	}
+
+	@Override
+	public List<Map<String, Object>> getExprationTodo() throws Exception {
+		// TODO Auto-generated method stub
+		return todoDAO.getExprationTodo();
+	}
+
+	@Override
+	public void moveAlarm(String list_key) throws Exception {
+		// TODO Auto-generated method stub
+		todoDAO.moveAlarm(list_key);
 	}
     
 }

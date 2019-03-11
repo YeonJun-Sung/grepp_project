@@ -18,4 +18,7 @@ public interface TodoService {
 	void orderPriority(int num) throws Exception;
 	int getMaxPriority() throws Exception;
 	void removePriority(String list_key) throws Exception;
+	void moveExprationTodo() throws Exception;
+	List<Map<String, Object>> getExprationTodo() throws Exception;
+	void moveAlarm(String list_key) throws Exception;
 }

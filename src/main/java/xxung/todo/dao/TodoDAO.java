@@ -82,9 +82,9 @@ public class TodoDAO extends AbstractDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, Object>> getPriorityList(int num) {
+	public List<Map<String, Object>> getPriorityList() {
 		// TODO Auto-generated method stub
-		return (List<Map<String, Object>>) selectList("todo.getPriorityList", num);
+		return (List<Map<String, Object>>) selectList("todo.getPriorityList");
 	}
 
 	public void updatePriority(List<Map<String, Object>> list) {
@@ -95,5 +95,21 @@ public class TodoDAO extends AbstractDAO {
 	public int getMaxPriority() {
 		// TODO Auto-generated method stub
 		return (int) selectOne("todo.getMaxPriority");
+	}
+
+	public void moveExprationTodo() {
+		// TODO Auto-generated method stub
+		update("todo.moveExprationTodo", "");
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, Object>> getExprationTodo() {
+		// TODO Auto-generated method stub
+		return (List<Map<String, Object>>) selectList("todo.getExprationTodo");
+	}
+
+	public void moveAlarm(String list_key) {
+		// TODO Auto-generated method stub
+		update("todo.moveAlarm", list_key);
 	}
 }

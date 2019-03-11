@@ -18,6 +18,7 @@ var key = "";
 var priority_max = 0;
 
 $(document).ready(function(){
+	expirationTodo();
 	getTodoList();
 	
 	$("#todo_detail_priority_edit, #todo_detail_priority_add, .priority_add").on("keyup", function(){
@@ -61,7 +62,9 @@ $(document).ready(function(){
 	        }
 	        , success : function(data) {
 	        	$("#todo_detail_title").text(data.list_title);
-       			$("#todo_detail_contents").text(data.list_content);
+	        	var content = data.list_content;
+	        	content = content.replace(/(?:\r\n|\r|\n)/g, '<br />');
+       			$("#todo_detail_contents").html(content);
        			if(data.list_date != null || data.list_date != "")
 	   				$("#todo_detail_deadline").text(data.list_date);
       			if(data.list_pri != null || data.list_pri != "")
@@ -278,21 +281,21 @@ $(document).ready(function(){
 		        	list_key: list_key
 		        }
 		        , success : function(data) {
-		        }
-		        , error : function(e) {
-		        	console.log(e.result);
-		        }
-		    });
-			orderPriority(priority);
-			$.ajax({
-				type : "POST"
-		        , url : "/grepp/todo/addPriority.do"
-		        , data : {
-		        	priority: priority
-		        	, list_key: list_key
-		        }
-		        , success : function(data) {
-		        	getTodoList();
+					orderPriority(priority);
+					$.ajax({
+						type : "POST"
+				        , url : "/grepp/todo/addPriority.do"
+				        , data : {
+				        	priority: priority
+				        	, list_key: list_key
+				        }
+				        , success : function(data) {
+				        	getTodoList();
+				        }
+				        , error : function(e) {
+				        	console.log(e.result);
+				        }
+				    });
 		        }
 		        , error : function(e) {
 		        	console.log(e.result);
@@ -300,9 +303,81 @@ $(document).ready(function(){
 		    });
 		}
 	});
+	
+	// 우선순위 한단계 상승 이벤트
+	$("body").on("click", ".priority_up_bt", function(){
+		var priority = parseInt($(this).data("pri")) - 1;
+		var list_key = $(this).parents("tr").data("key");
+		console.log(priority, list_key);
+		if(priority > 0){
+			$.ajax({
+				type : "POST"
+		        , url : "/grepp/todo/removePriority.do"
+		        , data : {
+		        	list_key: list_key
+		        }
+		        , success : function(data) {
+		    		orderPriority(priority);
+		    		$.ajax({
+		    			type : "POST"
+		    	        , url : "/grepp/todo/addPriority.do"
+		    	        , data : {
+		    	        	priority: priority
+		    	        	, list_key: list_key
+		    	        }
+		    	        , success : function(data) {
+		    	        	getTodoList();
+		    	        }
+		    	        , error : function(e) {
+		    	        	console.log(e.result);
+		    	        }
+		    	    });
+		        }
+		        , error : function(e) {
+		        	console.log(e.result);
+		        }
+		    });	
+		}
+	});
+	
+	// 우선순위 한단계 하락 이벤트
+	$("body").on("click", ".priority_down_bt", function(){
+		var priority = parseInt($(this).data("pri")) + 1;
+		var list_key = $(this).parents("tr").data("key");
+		console.log(priority, list_key);
+		if(priority <= priority_max){
+			$.ajax({
+				type : "POST"
+		        , url : "/grepp/todo/removePriority.do"
+		        , data : {
+		        	list_key: list_key
+		        }
+		        , success : function(data) {
+		    		orderPriority(priority);
+		    		$.ajax({
+		    			type : "POST"
+		    	        , url : "/grepp/todo/addPriority.do"
+		    	        , data : {
+		    	        	priority: priority
+		    	        	, list_key: list_key
+		    	        }
+		    	        , success : function(data) {
+		    	        	getTodoList();
+		    	        }
+		    	        , error : function(e) {
+		    	        	console.log(e.result);
+		    	        }
+		    	    });
+		        }
+		        , error : function(e) {
+		        	console.log(e.result);
+		        }
+		    });	
+		}
+	});
 });
 
-// TODO List 총 페이지 수와 불러오는 함수
+// TODO List Reload 함수
 function getTodoList() {
 	$.ajax({
         type : "POST"
@@ -332,7 +407,10 @@ function getTodoList() {
         , url : "/grepp/todo/getMaxPriority.do"
         , data : {}
         , success : function(data) {
-        	priority_max = data
+        	if(data == null)
+        		priority_max = 0;
+        	else
+        		priority_max = data
         }
         , error : function(e) {
         	console.log(e.result);
@@ -360,8 +438,8 @@ function getTodoList() {
             	}
             	else {
             		rtvHtml += "" + d.list_pri;
-                	rtvHtml += "<input type='button' class='priority_up_bt' value='△'>";
-                	rtvHtml += "<input type='button' class='priority_down_bt' value='▽'>";
+                	rtvHtml += "<input type='button' class='priority_up_bt' data-pri='" + d.list_pri + "' value='△'>";
+                	rtvHtml += "<input type='button' class='priority_down_bt' data-pri='" + d.list_pri + "' value='▽'>";
             	}
             	rtvHtml += "</td>";
             	rtvHtml += "<td>";
@@ -370,6 +448,10 @@ function getTodoList() {
             	rtvHtml += "<td data-status='" + d.list_stat + "'>";
             	if(d.list_date != null && d.list_date != "")
             		rtvHtml += "" + d.list_date;
+            	else
+            		rtvHtml += "-";
+            	if(d.list_stat == '-1' || d.list_stat == '0')
+            		rtvHtml += " <p style='color: red;margin: 0px;'>(마감)</p>";
             	rtvHtml += "</td>";
             	rtvHtml += "</tr>";
         	}
@@ -426,11 +508,11 @@ function createTodo(title, contents, deadline, priority) {
      , success : function(data) {
      	$("#todo_detail_title_edit").val("");
      	$("#todo_detail_contents_edit").val("");
-			$("#todo_detail_deadline_edit").val("");
-			$("#todo_detail_priority_edit").val("");
-			$("#todo_detail_title_edit").attr("data-key", "");
-			getTodoList();
-			alert("저장되었습니다.");
+		$("#todo_detail_deadline_edit").val("");
+		$("#todo_detail_priority_edit").val("");
+		$("#todo_detail_title_edit").attr("data-key", "");
+		getTodoList();
+		alert("저장되었습니다.");
      }
      , error : function(e) {
      	console.log(e.result);
@@ -453,6 +535,40 @@ function orderPriority(num) {
         }
     });
 }
+
+function expirationTodo() {
+	$.ajax({
+        type : "POST"
+        , url : "/grepp/todo/moveExprationTodo.do"
+        , data : {}
+        , success : function(data) {
+        	console.log(data);
+        	getTodoList();
+        	for(var i = 0;i < data.length;i++){
+        		var title = data[i].list_title;
+        		var date = data[i].list_date;
+            	alert("" + title + "은 " + date + " 부로 만료되었습니다.");
+            	$.ajax({
+                    type : "POST"
+                    , url : "/grepp/todo/moveAlarm.do"
+                    , data : {
+                    	list_key: data[i].list_key
+                    }
+                    , success : function(d) {
+                    	orderPriority(priority_max + 1);
+                    }
+                    , error : function(e) {
+                    	console.log(e.result);
+                    }
+                });
+        	}
+        }
+        , error : function(e) {
+        	console.log(e.result);
+        }
+    });
+}
+
 </script>
 <!-- 
 	- 새로운 TODO(제목 + 내용)를 작성한다

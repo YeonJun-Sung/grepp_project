@@ -56,8 +56,10 @@ public class TodoController {
  		String priority = req.getParameter("priority");
  		String list_key = req.getParameter("list_key");
  		todoService.removePriority(list_key);
- 		int parse_num = Integer.parseInt(priority);
- 		todoService.orderPriority(parse_num);
+ 		if(priority != null && !priority.equals("")) {
+ 	 		int parse_num = Integer.parseInt(priority);
+ 	 		todoService.orderPriority(parse_num);
+ 		}
  		
  		Map<String, Object> param = new HashMap<String, Object>();
  		param.put("title", title);
@@ -74,8 +76,10 @@ public class TodoController {
  		String contents = req.getParameter("contents");
  		String deadline = req.getParameter("deadline");
  		String priority = req.getParameter("priority");
- 		int parse_num = Integer.parseInt(priority);
- 		todoService.orderPriority(parse_num);
+ 		if(priority != null && !priority.equals("")) {
+ 	 		int parse_num = Integer.parseInt(priority);
+ 	 		todoService.orderPriority(parse_num);
+ 		}
  		
  		Map<String, Object> param = new HashMap<String, Object>();
  		param.put("title", title);
@@ -99,6 +103,8 @@ public class TodoController {
  		String list_key = req.getParameter("list_key");
  		
  		todoService.completeTodo(list_key);
+ 		int max_priority = todoService.getMaxPriority();
+ 		todoService.orderPriority(max_priority);
 	}
 	
  	@RequestMapping(value = "/todo/deleteTodo.do")
@@ -106,6 +112,8 @@ public class TodoController {
  		String list_key = req.getParameter("list_key");
  		
  		todoService.deleteTodo(list_key);
+ 		int max_priority = todoService.getMaxPriority();
+ 		todoService.orderPriority(max_priority);
 	}
 	
  	@RequestMapping(value = "/todo/addPriority.do")
@@ -135,6 +143,20 @@ public class TodoController {
  	@RequestMapping(value = "/todo/removePriority.do")
 	public @ResponseBody void removePriority(HttpServletRequest req) throws Exception {
  		String list_key = req.getParameter("list_key");
+ 		todoService.removePriority(list_key);
+	}
+	
+ 	@RequestMapping(value = "/todo/moveExprationTodo.do")
+	public @ResponseBody List<Map<String, Object>> moveExprationTodo(HttpServletRequest req) throws Exception {
+ 		todoService.moveExprationTodo();
+ 		List<Map<String, Object>> result = todoService.getExprationTodo();
+		return result;
+	}
+	
+ 	@RequestMapping(value = "/todo/moveAlarm.do")
+	public @ResponseBody void moveAlarm(HttpServletRequest req) throws Exception {
+ 		String list_key = req.getParameter("list_key");
+ 		todoService.moveAlarm(list_key);
  		todoService.removePriority(list_key);
 	}
 }
